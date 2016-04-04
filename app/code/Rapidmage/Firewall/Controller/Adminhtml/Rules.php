@@ -44,4 +44,8 @@ class Rules extends \Magento\Backend\App\Action
     {
         return $this->_authorization->isAllowed('Rapidmage_Firewall::manage_rules');
     }
+     public function execute()
+   {
+      
+   }
 }

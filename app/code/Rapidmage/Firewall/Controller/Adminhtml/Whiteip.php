@@ -58,4 +58,8 @@ class Whiteip extends Action
     {
         return $this->_authorization->isAllowed('Rapidmage_Firewall::manage_ip');
     }
+     public function execute()
+   {
+      
+   }
 }

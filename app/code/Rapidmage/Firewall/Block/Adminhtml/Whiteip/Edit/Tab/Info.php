@@ -97,10 +97,16 @@ class Info extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
             [
                 'name'      => 'member_access',
                 'label'     => __('Status'),
-                'options'   => $this->_ipStatus->toWhiteListArray()
+                
+                 'disabled' => false,       
+                'values'   => $this->_ipStatus->toWhiteListArray()
+                
             ]
         );
+        
+        $model->setData('member_access', 1);
         $data = $model->getData();
+        
         $form->setValues($data);
         $this->setForm($form);
  

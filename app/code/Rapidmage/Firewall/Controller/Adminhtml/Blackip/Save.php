@@ -68,6 +68,7 @@ class Save extends \Magento\Backend\App\Action
          }
          $formData = $this->getRequest()->getParam('ip');
          $ipModel->setData($formData);
+        
          
          try {
             // Save Ip
@@ -81,6 +82,10 @@ class Save extends \Magento\Backend\App\Action
                $this->_redirect('*/*/edit', ['id' => $ipModel->getId(), '_current' => true]);
                return;
             }
+            if($formData['member_access']==1){
+				return $this->resultRedirectFactory->create()->setPath('firewall/whiteip/', ['_current' => true]);
+				
+			}
  
             // Go to grid page
             $this->_redirect('*/*/');
