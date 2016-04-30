@@ -1,4 +1,6 @@
 var/*
-bin/*
-app/etc/*
-pub/*
+app/etc/env.php
+pub/errors/*
+pub/media/*
+pub/opt/*
+pub/static/*
