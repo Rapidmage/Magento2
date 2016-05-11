@@ -9,6 +9,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	protected $scopeConfig;
 	protected $_logger;
 	protected $_rulesFactory;
+	protected $MagenfCheckDebug;
 	public function __construct(
            ScopeConfigInterface $scopeConfig,
            Logger $logger,
@@ -26,9 +27,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     
     public function getClientIp(){
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
-			$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
+		$ip_address = '';
+		if(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != '') {			
 			$ip_address = $_SERVER['REMOTE_ADDR'];
 		}
 		return $ip_address;		
@@ -46,8 +46,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		}
 		return $res;
 	}
-	public function nf_write2log( $loginfo, $logdata, $loglevel, $ruleid ) {
-	   global $MagenfCheckDebug;
+	public function nf_write2log( $loginfo, $logdata, $loglevel, $ruleid ) {	  
 	   global $rand_value;
 	   global $nfdebug;
 	   global $ip_address;
@@ -70,14 +69,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	   //Mage::log($message, null, "firewall_-".date('Y-m-d').".log");
 	  // fclose($handle);
 	}
-	   public function nf_block() {
+	   public function nf_block($msg) {
 	   global $nfdebug;
 	   global $rand_value;
 	   global $ip_address;
-	
+		$message = ($msg=='') ? $rand_value : $msg;
 	   header('HTTP/1.1 403 Forbidden');
 		header('Status: 403 Forbidden');
-		echo '<html><head><title>403 Forbidden</title><style>.smallblack{font-family:Verdana,Arial,Helvetica,Ubuntu,"Bitstream Vera Sans",sans-serif;font-size:12px;line-height:16px;color:#000000;}.tinygrey{font-family:Verdana,Arial,Helvetica,Ubuntu, "Bitstream Vera Sans",sans-serif;font-size:10px;line-height:12px;color:#999999;}</style></head><body><br><br><br><br><br><table align=center style="border:1px solid #FDCD25;" cellspacing=0 cellpadding=6 class=smallblack><tr><td align=center><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH1goFFS4tIeiJwwAAAqNJREFUOMttk9trXFUUxn97nz0zZ+ZEEnNFwSAhVQoKEcFCqaJ9CQhBnxRC639QCvqgkJdQGoo3fBbxQmlLzIPoQ0SKEAQlITEEL6mkScUmJ2MymclJzlzOTM6cs3w4U3OhH+yXtdb3fWvtxVKcwPI4g20Z3nW6H30509HvgCLcc2tVr/hT4PPRU1f5i4dhZhzjfpz+Mpx/25fdJZE4kkPEIt7vEi68429+kr3x66ekjpFlCqvwef+8FH6OJPRFQl+q+9vy9eQtuXnjupQK6/IgLsW5aOeLJxeXx0kDGIC8y2ePvzb+HCanKa8BsHLnH+YXFjHG0NUmDL/0bOKm07r7/MRQ+O1bX0E0au59wKmegadHMI6hsgoa0FD11snn81iWxc52BglslAAxoIzuHjg9vPbhn88Yx+G9VC7dTbCW9KMTo9r+Jq7rorVmr2ghQRqlFQgQQiqb7mxvY8zkOjgHGxCuQgSoRCQob+O6LkopdosCByrJCUkd97HbecGYHDZ6D6qzYPf8L1ArF9nY2Eg62G0iYQRKJSM0SqBLGIeMUVkUFnBwF9QWpOxkM3GdZrMJQHhQBGkk5LAOB34yrg1GFA1SgCWg90Htg4InHjtcc19PDaVqrS0AKaAJommYsMFstpNBaCVM8l48C79MgbsFr5wBbbdm161/MhB5LOlmhfdjGx/TEkgBaVhx4c3LcOkK/PF3EjtqIFnKUcA13TXKcrDDD7QRYx2KfHMb3H+hUITJaYj0EQGHuF7gx443WNQATpGLjT2WeIQIKyl6fQT6eqGrE0ZeBcsGrITc8FjOVrhw/B6+J1OfYyr28MRHxEfiKhIHiFQQKSOxh1ef5zuZwX7AUyevsjLNUKqXMauL51WOtIAioB6V+K1ZYsIZZvFo/X+fTjL6xSvBJAAAAABJRU5ErkJggg==" border=0 width=16 height=16><p>Sorry <b>'. $ip_address .'</b>, your request cannot be proceeded.<br>For security reason it was blocked and logged.<p>If you think that this was a mistake, please contact<br>the webmaster and enclose the following incident ID&nbsp;:<p>[<b>#' . $rand_value . '</b>]<br>&nbsp;</td></tr></table><br><br><br><br></body></html>';
+		echo '<html><head><title>403 Forbidden</title><style>.smallblack{font-family:Verdana,Arial,Helvetica,Ubuntu,"Bitstream Vera Sans",sans-serif;font-size:12px;line-height:16px;color:#000000;}.tinygrey{font-family:Verdana,Arial,Helvetica,Ubuntu, "Bitstream Vera Sans",sans-serif;font-size:10px;line-height:12px;color:#999999;}</style></head><body><br><br><br><br><br><table align=center style="border:1px solid #FDCD25;" cellspacing=0 cellpadding=6 class=smallblack><tr><td align=center><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH1goFFS4tIeiJwwAAAqNJREFUOMttk9trXFUUxn97nz0zZ+ZEEnNFwSAhVQoKEcFCqaJ9CQhBnxRC639QCvqgkJdQGoo3fBbxQmlLzIPoQ0SKEAQlITEEL6mkScUmJ2MymclJzlzOTM6cs3w4U3OhH+yXtdb3fWvtxVKcwPI4g20Z3nW6H30509HvgCLcc2tVr/hT4PPRU1f5i4dhZhzjfpz+Mpx/25fdJZE4kkPEIt7vEi68429+kr3x66ekjpFlCqvwef+8FH6OJPRFQl+q+9vy9eQtuXnjupQK6/IgLsW5aOeLJxeXx0kDGIC8y2ePvzb+HCanKa8BsHLnH+YXFjHG0NUmDL/0bOKm07r7/MRQ+O1bX0E0au59wKmegadHMI6hsgoa0FD11snn81iWxc52BglslAAxoIzuHjg9vPbhn88Yx+G9VC7dTbCW9KMTo9r+Jq7rorVmr2ghQRqlFQgQQiqb7mxvY8zkOjgHGxCuQgSoRCQob+O6LkopdosCByrJCUkd97HbecGYHDZ6D6qzYPf8L1ArF9nY2Eg62G0iYQRKJSM0SqBLGIeMUVkUFnBwF9QWpOxkM3GdZrMJQHhQBGkk5LAOB34yrg1GFA1SgCWg90Htg4InHjtcc19PDaVqrS0AKaAJommYsMFstpNBaCVM8l48C79MgbsFr5wBbbdm161/MhB5LOlmhfdjGx/TEkgBaVhx4c3LcOkK/PF3EjtqIFnKUcA13TXKcrDDD7QRYx2KfHMb3H+hUITJaYj0EQGHuF7gx443WNQATpGLjT2WeIQIKyl6fQT6eqGrE0ZeBcsGrITc8FjOVrhw/B6+J1OfYyr28MRHxEfiKhIHiFQQKSOxh1ef5zuZwX7AUyevsjLNUKqXMauL51WOtIAioB6V+K1ZYsIZZvFo/X+fTjL6xSvBJAAAAABJRU5ErkJggg==" border=0 width=16 height=16><p>Sorry <b>'. $ip_address .'</b>, your request cannot be proceeded.<br>For security reason it was blocked and logged.<p>If you think that this was a mistake, please contact<br>the webmaster and enclose the following incident ID&nbsp;:<p>[<b>#' . $message . '</b>]<br>&nbsp;</td></tr></table><br><br><br><br></body></html>';
 	
 	   if ($nfdebug) {define('NFDEBUG', $nfdebug . '::' . $this->nf_benchmarks() );}
 	
@@ -88,6 +87,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
        return round( (microtime(true) - $start_time), 5);
     }
     function nf_check_request() {
+		$MagenfCheckDebug = 2;
+		$nfdebug = STAG ."starting Firewall". ETAG ;
 		if(!defined('STAG') && !defined('ETAG') && !defined('NF_STARTTIME')) {
 			    define('STAG', '- ');
 		        define('ETAG', "\n");
@@ -100,9 +101,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		foreach($ruleCollection as $rulesData){
 			$wherelist = explode('|', $rulesData['request']);	
 			foreach ($wherelist as $where) {
-			
-				if ( ($where == 'POST') || ($where == 'GET') ) {
+				
+				if ( ($where == 'POST') || ($where == 'GET') ) {					
 					foreach ($GLOBALS['_' . $where] as $reqkey => $reqvalue) {
+						//print_r($reqvalue);
 	               if (is_array($reqvalue) ) {
 	                  $res = $this->nf_flatten( "\n", $reqvalue );
 	                  $reqvalue = $res;
@@ -120,11 +122,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	               
 	               //print_r($rulesData['what'] . "<br />");die;
 	               if ( preg_match('`'.$rulesData['what'].'`', $reqvalue) ) {
-					   
-	                  if ($MagenfCheckDebug) { $nfdebug.= STAG ."checking request\t\t". '[FAIL]   '. $where .' : ' . $rulesData['why'] . ' (#'. $rulesData['rules_id'] . ')' . ETAG; }
+					   $msg = $rulesData['why'].' == '.$rulesData['id'];
+					    $this->nf_write2log($rulesData['why'], $where . ':' . $reqkey . ' = ' . $reqvalue, $rulesData['level'], $rulesData['id']);
+	                  if ($MagenfCheckDebug) { $nfdebug.= STAG ."checking request\t\t". '[FAIL]   '. $where .' : ' . $rulesData['why'] . ' (#'. $rulesData['id'] . ')' . ETAG; }
 	                 
-	                  $this->nf_write2log($rulesData['why'], $where . ':' . $reqkey . ' = ' . $reqvalue, $rulesData['level'], $rulesData['rules_id']);
-	                  $this->nf_block();
+	                  $this->nf_write2log($rulesData['why'], $where . ':' . $reqkey . ' = ' . $reqvalue, $rulesData['level'], $rulesData['id']);
+	                  $this->nf_block($msg);
 	               } 
 	               
 				   

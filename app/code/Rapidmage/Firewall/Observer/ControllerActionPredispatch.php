@@ -15,7 +15,7 @@ class ControllerActionPredispatch implements ObserverInterface {
 
 	public function __construct(         
            IpFactory $ipFactory,
-           Ipaccess $Ipaccess,         
+           Ipaccess $Ipaccess,     
            Data $helper
          ) {
 			 $this->ipaccessObject = $Ipaccess;           
@@ -38,7 +38,10 @@ class ControllerActionPredispatch implements ObserverInterface {
 				$getIpOptionValue=$this->helper->getOptionsData('ban_attack_ip');
 				$CheckipOption = ($getIpOptionValue==0) ? 'off' : 'on';
 				
-		        $ip_address = $this->helper->getClientIp();
+		        $ip_address = $this->helper->getClientIp(); 
+		        if($ip_address==''){
+					die('ip address doesnot valid');
+				}
 		       
 		        
 		        /* Start - Check Black ip try to access */
@@ -69,20 +72,21 @@ class ControllerActionPredispatch implements ObserverInterface {
                  //echo $_SERVER['SCRIPT_FILENAME'];die;
 		        /* Start - Check - Request Method */ 
 				if ( strpos('GET|POST|HEAD', $_SERVER['REQUEST_METHOD']) === false ) {
-				  
+					//echo '1';
 					  $nfdebug.="REQUEST_METHOD\t\t[FAIL]   ". $this->helper->nf_bin2hex_string($_SERVER['REQUEST_METHOD']) .' not allowed';
 					  $this->helper->nf_write2log('request method not allowed', $_SERVER['REQUEST_METHOD'], 2, 0);
 				      $this->helper->nf_block();
 				}
 				 /* End - Check - Request Method */ 
 				 /* Start - Check whether Host is ip or domain */ 
-				if (preg_match('/^[\d.:]+$/', $_SERVER['HTTP_HOST'])) {//echo "welcome";die;
+				if (preg_match('/^[\d.:]+$/', $_SERVER['HTTP_HOST'])) {// echo "welcome";die;
 					if ($MagenfCheckDebug) { $nfdebug.= STAG ."HTTP_HOST\t\t\t[FAIL]   HTTP_HOST is an IP (".$_SERVER['HTTP_HOST']  .')'. ETAG; }
 					$this->helper->nf_write2log('HTTP_HOST is an IP', $_SERVER['HTTP_HOST'], 1, 0);
 					if($getIpOptionValue==1){
 						$this->helper->nf_block();
 					}
 				}
+				//die('sdfdf');
 				 /* End - Check whether Host is ip or domain */
 			    $this->helper->nf_check_request();  // Check Firewall rules
 			    $nfdebug.= STAG ."checking uploads\t\t"; 			  
